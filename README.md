@@ -1,4 +1,4 @@
-# [josephdayngerruiz.github.io](https://josephdayngerruiz.github.io/)
+# [josephdayngerruiz.github.io](https://josephdayngerruiz.github.io/){:target="_blank"}
 
 This is my website!
 
