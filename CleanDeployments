@@ -1,0 +1,15 @@
+curl -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/JosephDayngerRuiz/josephdayngerruiz.github.io/deployments?per_page=100" | \
+jq -r '.[].id' | \
+xargs -n1 -I {} curl -L -X DELETE \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/JosephDayngerRuiz/josephdayngerruiz.github.io/deployments/{}"
+
+## Solution found here https://github.com/orgs/community/discussions/85000
+## Needed to use wsl with Ubuntu to run this script
+## Needed to insall jq since it did not comw with Ubuntu in wsl
