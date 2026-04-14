@@ -12,4 +12,4 @@ xargs -n1 -I {} curl -L -X DELETE \
 
 ## Solution found here https://github.com/orgs/community/discussions/85000
 ## Needed to use wsl with Ubuntu to run this script
-## Needed to insall jq since it did not comw with Ubuntu in wsl
+## Needed to insall jq since it did not come with Ubuntu in wsl
