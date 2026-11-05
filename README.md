@@ -14,6 +14,6 @@ The style may be reminisite of ancient websites on the internet, but there was n
 website in any particular way.
 
 Furthermore as the project goes on, it may be that the website itself no longer reflects the insecurites
-or purpouses found in the README.md.
+or purposes found in the README.md.
 
 Thank you for visiting the github repoitory. I hope it was illuminating and helped you accomplish something.
