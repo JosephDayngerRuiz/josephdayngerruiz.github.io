@@ -79,11 +79,11 @@
 <div id="quiver-canvas"></div>
 <section id="diagram-editor" aria-label="Diagram editor">
   <a class="page-button" href="index.html">Back to home</a>
-  <label for="diagram-input"><strong>Diagram connections</strong></label>
-  <textarea id="diagram-input" aria-describedby="diagram-help" spellcheck="false" placeholder="a -> b&#10;c -- d"></textarea>
+  <label for="diagram-input"><strong>Diagram vertices and connections</strong></label>
+  <textarea id="diagram-input" aria-describedby="diagram-help" spellcheck="false" placeholder="a : First label&#10;b : Second label&#10;&#10;a -> b"></textarea>
   <button id="load-diagram" type="button">Load diagram</button>
-  <p id="diagram-status" role="status" aria-live="polite">Use one connection per line: a -&gt; b or c -- d.</p>
-  <p id="diagram-help">Press Shift+Enter to load.</p>
+  <p id="diagram-status" role="status" aria-live="polite">Use “a : Label” to label a vertex, “a -&gt; b” for a solid arrow, or “a -- b” for a dashed arrow.</p>
+  <p id="diagram-help">Unlabeled vertices display their names. Press Shift+Enter to load.</p>
   <p id="ai-disclaimer">Disclaimer: This page was generated with the assistance of AI. Please verify any results independently.</p>
 </section>
 
@@ -152,16 +152,37 @@
     var status = document.getElementById('diagram-status');
     var parsedEdges = [];
     var nodeNames = new Set();
+    var vertexLabels = new Map();
     var lines = input.split(/\r?\n/);
     var linePattern = /^\s*([A-Za-z0-9_ ]+?)\s+(->|--)\s+([A-Za-z0-9_ ]+?)\s*$/;
+    var labelPattern = /^\s*([A-Za-z0-9_ ]+?)\s+:\s+([A-Za-z0-9_ ]+?)\s*$/;
 
     for (var index = 0; index < lines.length; index += 1) {
       var line = lines[index].trim();
       if (line === '') continue;
 
+      var labelMatch = line.match(labelPattern);
+      if (labelMatch) {
+        var vertex = labelMatch[1].trim();
+        var label = labelMatch[2].trim();
+        if (!vertex || !label) {
+          status.textContent = 'Invalid vertex label on line ' + (index + 1) + '. Use “vertex : label”.';
+          status.style.color = '#b00020';
+          return;
+        }
+        if (vertexLabels.has(vertex) && vertexLabels.get(vertex) !== label) {
+          status.textContent = 'Conflicting labels for vertex "' + vertex + '" on line ' + (index + 1) + '.';
+          status.style.color = '#b00020';
+          return;
+        }
+        nodeNames.add(vertex);
+        vertexLabels.set(vertex, label);
+        continue;
+      }
+
       var match = line.match(linePattern);
       if (!match || !match[1].trim() || !match[3].trim()) {
-        status.textContent = 'Invalid connection on line ' + (index + 1) + '. Use “name -> name” or “name -- name” with letters, numbers, and spaces.';
+        status.textContent = 'Invalid line ' + (index + 1) + '. Use “vertex : label”, “name -> name”, or “name -- name”.';
         status.style.color = '#b00020';
         return;
       }
@@ -180,8 +201,8 @@
       });
     }
 
-    if (parsedEdges.length === 0) {
-      status.textContent = 'Enter at least one valid connection before loading.';
+    if (nodeNames.size === 0) {
+      status.textContent = 'Enter at least one vertex label or connection before loading.';
       status.style.color = '#b00020';
       return;
     }
@@ -189,7 +210,7 @@
     var parsedNodes = Array.from(nodeNames, function (name) {
       return {
         id: name,
-        label: name,
+        label: vertexLabels.has(name) ? vertexLabels.get(name) : name,
         shape: 'circle',
         color: { background: '#ffffff', border: '#000000' }
       };
@@ -199,7 +220,7 @@
     edges.clear();
     nodes.add(parsedNodes);
     edges.add(parsedEdges);
-    status.textContent = 'Diagram loaded: ' + parsedNodes.length + ' nodes, ' + parsedEdges.length + ' connections.';
+    status.textContent = 'Diagram loaded: ' + parsedNodes.length + ' vertices, ' + parsedEdges.length + ' connections.';
     status.style.color = '#216e39';
   });
 
